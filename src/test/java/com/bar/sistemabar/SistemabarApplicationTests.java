@@ -1,0 +1,13 @@
+package com.bar.sistemabar;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class SistemabarApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
