@@ -3,8 +3,6 @@ package com.bar.sistemabar.internal.produto.entity;
 import com.bar.sistemabar.internal.categoria.entity.CategoriaEntity;
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "TB_PRODUTO")
 public class ProdutoEntity {
@@ -13,37 +11,25 @@ public class ProdutoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "NOME", nullable = false)
     private String nome;
 
-    @Column(name = "DESCRICAO")
-    private String descricao;
+    private Double preco;
 
-    @Column(name = "PRECO", nullable = false)
-    private BigDecimal preco;
-
-    @Column(name = "CONTROLA_ESTOQUE", nullable = false)
     private Boolean controlaEstoque;
 
-    @Column(name = "TIPO_LANCAMENTO", nullable = false)
     private String tipoLancamento;
 
-    @Column(name = "STATUS", nullable = false)
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "CATEGORIA_ID")
+    @JoinColumn(name = "categoria_id")
     private CategoriaEntity categoria;
 
     public ProdutoEntity() {
     }
 
-    public ProdutoEntity(Long id, String nome, String descricao, BigDecimal preco,
-                         Boolean controlaEstoque, String tipoLancamento,
-                         String status, CategoriaEntity categoria) {
-        this.id = id;
+    public ProdutoEntity(String nome, Double preco, Boolean controlaEstoque, String tipoLancamento, String status, CategoriaEntity categoria) {
         this.nome = nome;
-        this.descricao = descricao;
         this.preco = preco;
         this.controlaEstoque = controlaEstoque;
         this.tipoLancamento = tipoLancamento;
@@ -59,11 +45,7 @@ public class ProdutoEntity {
         return nome;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public BigDecimal getPreco() {
+    public Double getPreco() {
         return preco;
     }
 
@@ -91,11 +73,7 @@ public class ProdutoEntity {
         this.nome = nome;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public void setPreco(BigDecimal preco) {
+    public void setPreco(Double preco) {
         this.preco = preco;
     }
 
