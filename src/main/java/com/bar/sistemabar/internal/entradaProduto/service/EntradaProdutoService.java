@@ -1,11 +1,14 @@
 package com.bar.sistemabar.internal.entradaProduto.service;
 
+import com.bar.sistemabar.config.exception.BusinessException;
 import com.bar.sistemabar.config.exception.RecursoNaoEncontradoException;
 import com.bar.sistemabar.internal.entradaProduto.dto.EntradaProdutoRequestRecord;
 import com.bar.sistemabar.internal.entradaProduto.dto.EntradaProdutoResponseRecord;
 import com.bar.sistemabar.internal.entradaProduto.entity.EntradaProdutoEntity;
 import com.bar.sistemabar.internal.entradaProduto.mapper.EntradaProdutoMapperRecord;
 import com.bar.sistemabar.internal.entradaProduto.repository.EntradaProdutoRepository;
+import com.bar.sistemabar.internal.movimentoDia.entity.StatusMovimentoDia;
+import com.bar.sistemabar.internal.movimentoDia.repository.MovimentoDiaRepository;
 import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
 import com.bar.sistemabar.internal.produto.repository.ProdutoRepository;
 import com.bar.sistemabar.internal.usuario.entity.UsuarioEntity;
@@ -13,6 +16,7 @@ import com.bar.sistemabar.internal.usuario.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -21,19 +25,31 @@ public class EntradaProdutoService {
     private final EntradaProdutoRepository entradaProdutoRepository;
     private final ProdutoRepository produtoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final MovimentoDiaRepository movimentoDiaRepository;
 
     public EntradaProdutoService(
             EntradaProdutoRepository entradaProdutoRepository,
             ProdutoRepository produtoRepository,
-            UsuarioRepository usuarioRepository
+            UsuarioRepository usuarioRepository,
+            MovimentoDiaRepository movimentoDiaRepository
     ) {
         this.entradaProdutoRepository = entradaProdutoRepository;
         this.produtoRepository = produtoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.movimentoDiaRepository = movimentoDiaRepository;
     }
 
     @Transactional
     public EntradaProdutoResponseRecord cadastrar(EntradaProdutoRequestRecord request) {
+
+        boolean existeMovimentoAberto = movimentoDiaRepository.existsByDataMovimentoAndStatus(
+                LocalDate.now(),
+                StatusMovimentoDia.ABERTO
+        );
+
+        if (!existeMovimentoAberto) {
+            throw new BusinessException("Não existe movimento do dia aberto para registrar entrada de produto.");
+        }
 
         ProdutoEntity produto = produtoRepository.findById(request.produtoId())
                 .orElseThrow(() ->
