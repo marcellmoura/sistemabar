@@ -1,14 +1,20 @@
 package com.bar.sistemabar.internal.produto.dto;
 
+import com.bar.sistemabar.internal.produto.entity.StatusProduto;
+import com.bar.sistemabar.internal.produto.entity.TipoLancamentoProduto;
+
 public record ProdutoResponseRecord(
+
         Long id,
         String nome,
+        String descricao,
         Double preco,
-        Integer quantidadeEstoque,
         Boolean controlaEstoque,
-        String tipoLancamento,
-        String status,
+        Integer quantidadeEstoque,
+        TipoLancamentoProduto tipoLancamento,
+        StatusProduto status,
         Long categoriaId,
         String categoriaNome
+
 ) {
 }

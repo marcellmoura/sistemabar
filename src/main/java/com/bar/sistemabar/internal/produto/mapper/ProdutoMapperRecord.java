@@ -9,13 +9,17 @@ import java.util.List;
 
 public record ProdutoMapperRecord() {
 
-    public static ProdutoEntity paraEntity(ProdutoRequestRecord request, CategoriaEntity categoria) {
+    public static ProdutoEntity paraEntity(
+            ProdutoRequestRecord request,
+            CategoriaEntity categoria
+    ) {
 
         return new ProdutoEntity(
                 request.nome(),
+                request.descricao(),
                 request.preco(),
-                0,
                 request.controlaEstoque(),
+                request.quantidadeEstoque(),
                 request.tipoLancamento(),
                 request.status(),
                 categoria
@@ -27,9 +31,10 @@ public record ProdutoMapperRecord() {
         return new ProdutoResponseRecord(
                 entity.getId(),
                 entity.getNome(),
+                entity.getDescricao(),
                 entity.getPreco(),
-                entity.getQuantidadeEstoque(),
                 entity.getControlaEstoque(),
+                entity.getQuantidadeEstoque(),
                 entity.getTipoLancamento(),
                 entity.getStatus(),
                 entity.getCategoria().getId(),
@@ -37,7 +42,9 @@ public record ProdutoMapperRecord() {
         );
     }
 
-    public static List<ProdutoResponseRecord> paraListaResponse(List<ProdutoEntity> entities) {
+    public static List<ProdutoResponseRecord> paraListaResponse(
+            List<ProdutoEntity> entities
+    ) {
 
         return entities.stream()
                 .map(ProdutoMapperRecord::paraResponse)

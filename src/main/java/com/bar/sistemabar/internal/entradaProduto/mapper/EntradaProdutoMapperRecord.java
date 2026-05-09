@@ -16,6 +16,7 @@ public record EntradaProdutoMapperRecord() {
             ProdutoEntity produto,
             UsuarioEntity usuario
     ) {
+
         return new EntradaProdutoEntity(
                 request.quantidade(),
                 request.tipoEntrada(),
@@ -25,7 +26,10 @@ public record EntradaProdutoMapperRecord() {
         );
     }
 
-    public static EntradaProdutoResponseRecord paraResponse(EntradaProdutoEntity entity) {
+    public static EntradaProdutoResponseRecord paraResponse(
+            EntradaProdutoEntity entity
+    ) {
+
         return new EntradaProdutoResponseRecord(
                 entity.getId(),
                 entity.getProduto().getId(),
@@ -38,7 +42,10 @@ public record EntradaProdutoMapperRecord() {
         );
     }
 
-    public static List<EntradaProdutoResponseRecord> paraListaResponse(List<EntradaProdutoEntity> entities) {
+    public static List<EntradaProdutoResponseRecord> paraListaResponse(
+            List<EntradaProdutoEntity> entities
+    ) {
+
         return entities.stream()
                 .map(EntradaProdutoMapperRecord::paraResponse)
                 .toList();

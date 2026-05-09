@@ -12,16 +12,16 @@ public class ProdutoEntity {
     private Long id;
 
     private String nome;
-
+    private String descricao;
     private Double preco;
-
+    private Boolean controlaEstoque;
     private Integer quantidadeEstoque;
 
-    private Boolean controlaEstoque;
+    @Enumerated(EnumType.STRING)
+    private TipoLancamentoProduto tipoLancamento;
 
-    private String tipoLancamento;
-
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private StatusProduto status;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
@@ -30,19 +30,14 @@ public class ProdutoEntity {
     public ProdutoEntity() {
     }
 
-    public ProdutoEntity(
-            String nome,
-            Double preco,
-            Integer quantidadeEstoque,
-            Boolean controlaEstoque,
-            String tipoLancamento,
-            String status,
-            CategoriaEntity categoria
-    ) {
+    public ProdutoEntity(String nome, String descricao, Double preco, Boolean controlaEstoque,
+                         Integer quantidadeEstoque, TipoLancamentoProduto tipoLancamento,
+                         StatusProduto status, CategoriaEntity categoria) {
         this.nome = nome;
+        this.descricao = descricao;
         this.preco = preco;
-        this.quantidadeEstoque = quantidadeEstoque;
         this.controlaEstoque = controlaEstoque;
+        this.quantidadeEstoque = quantidadeEstoque;
         this.tipoLancamento = tipoLancamento;
         this.status = status;
         this.categoria = categoria;
@@ -56,23 +51,27 @@ public class ProdutoEntity {
         return nome;
     }
 
-    public Double getPreco() {
-        return preco;
+    public String getDescricao() {
+        return descricao;
     }
 
-    public Integer getQuantidadeEstoque() {
-        return quantidadeEstoque;
+    public Double getPreco() {
+        return preco;
     }
 
     public Boolean getControlaEstoque() {
         return controlaEstoque;
     }
 
-    public String getTipoLancamento() {
+    public Integer getQuantidadeEstoque() {
+        return quantidadeEstoque;
+    }
+
+    public TipoLancamentoProduto getTipoLancamento() {
         return tipoLancamento;
     }
 
-    public String getStatus() {
+    public StatusProduto getStatus() {
         return status;
     }
 
@@ -88,23 +87,27 @@ public class ProdutoEntity {
         this.nome = nome;
     }
 
-    public void setPreco(Double preco) {
-        this.preco = preco;
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
-    public void setQuantidadeEstoque(Integer quantidadeEstoque) {
-        this.quantidadeEstoque = quantidadeEstoque;
+    public void setPreco(Double preco) {
+        this.preco = preco;
     }
 
     public void setControlaEstoque(Boolean controlaEstoque) {
         this.controlaEstoque = controlaEstoque;
     }
 
-    public void setTipoLancamento(String tipoLancamento) {
+    public void setQuantidadeEstoque(Integer quantidadeEstoque) {
+        this.quantidadeEstoque = quantidadeEstoque;
+    }
+
+    public void setTipoLancamento(TipoLancamentoProduto tipoLancamento) {
         this.tipoLancamento = tipoLancamento;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusProduto status) {
         this.status = status;
     }
 

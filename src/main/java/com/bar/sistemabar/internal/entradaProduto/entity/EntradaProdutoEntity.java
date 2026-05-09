@@ -16,7 +16,8 @@ public class EntradaProdutoEntity {
 
     private Integer quantidade;
 
-    private String tipoEntrada;
+    @Enumerated(EnumType.STRING)
+    private TipoEntradaProduto tipoEntrada;
 
     private LocalDateTime dataHora;
 
@@ -31,7 +32,8 @@ public class EntradaProdutoEntity {
     public EntradaProdutoEntity() {
     }
 
-    public EntradaProdutoEntity(Integer quantidade, String tipoEntrada, LocalDateTime dataHora, ProdutoEntity produto, UsuarioEntity usuario) {
+    public EntradaProdutoEntity(Integer quantidade, TipoEntradaProduto tipoEntrada,
+                                LocalDateTime dataHora, ProdutoEntity produto, UsuarioEntity usuario) {
         this.quantidade = quantidade;
         this.tipoEntrada = tipoEntrada;
         this.dataHora = dataHora;
@@ -47,7 +49,7 @@ public class EntradaProdutoEntity {
         return quantidade;
     }
 
-    public String getTipoEntrada() {
+    public TipoEntradaProduto getTipoEntrada() {
         return tipoEntrada;
     }
 
@@ -71,7 +73,7 @@ public class EntradaProdutoEntity {
         this.quantidade = quantidade;
     }
 
-    public void setTipoEntrada(String tipoEntrada) {
+    public void setTipoEntrada(TipoEntradaProduto tipoEntrada) {
         this.tipoEntrada = tipoEntrada;
     }
 

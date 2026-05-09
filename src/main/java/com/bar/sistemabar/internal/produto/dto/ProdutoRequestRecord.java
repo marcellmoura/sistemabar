@@ -1,28 +1,39 @@
 package com.bar.sistemabar.internal.produto.dto;
 
+import com.bar.sistemabar.internal.produto.entity.StatusProduto;
+import com.bar.sistemabar.internal.produto.entity.TipoLancamentoProduto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 public record ProdutoRequestRecord(
 
-        @NotBlank(message = "O nome do produto é obrigatório")
+        @NotBlank(message = "O nome é obrigatório.")
         String nome,
 
-        @NotNull(message = "O preço do produto é obrigatório")
-        @Positive(message = "O preço deve ser maior que zero")
+        @NotBlank(message = "A descrição é obrigatória.")
+        String descricao,
+
+        @NotNull(message = "O preço é obrigatório.")
+        @Positive(message = "O preço deve ser maior que zero.")
         Double preco,
 
-        @NotNull(message = "Informe se o produto controla estoque")
+        @NotNull(message = "O controle de estoque é obrigatório.")
         Boolean controlaEstoque,
 
-        @NotBlank(message = "O tipo de lançamento é obrigatório")
-        String tipoLancamento,
+        @NotNull(message = "A quantidade em estoque é obrigatória.")
+        @PositiveOrZero(message = "A quantidade em estoque não pode ser negativa.")
+        Integer quantidadeEstoque,
 
-        @NotBlank(message = "O status é obrigatório")
-        String status,
+        @NotNull(message = "O tipo de lançamento é obrigatório.")
+        TipoLancamentoProduto tipoLancamento,
 
-        @NotNull(message = "A categoria é obrigatória")
+        @NotNull(message = "O status é obrigatório.")
+        StatusProduto status,
+
+        @NotNull(message = "A categoria é obrigatória.")
         Long categoriaId
+
 ) {
 }
