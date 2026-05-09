@@ -23,34 +23,46 @@ public class UsuarioService {
     }
 
     public UsuarioResponseRecord cadastrar(UsuarioRequestRecord request) {
+
+        if (usuarioRepository.existsByEmail(request.email())) {
+            throw new BusinessException("Já existe usuário com esse email.");
+        }
+
         UsuarioEntity entity = usuarioMapper.toEntity(request);
+
         return usuarioMapper.toResponse(usuarioRepository.save(entity));
     }
 
     public UsuarioResponseRecord editar(Long id, UsuarioRequestRecord request) {
-        UsuarioEntity entity = buscarPorId(id);
+        UsuarioEntity entity = buscarPorIdEntity(id);
+
         entity.setNome(request.nome());
         entity.setEmail(request.email());
         entity.setSenha(request.senha());
         entity.setPerfil(request.perfil());
         entity.setStatus(request.status());
+
         return usuarioMapper.toResponse(usuarioRepository.save(entity));
     }
 
     public UsuarioResponseRecord ativar(Long id) {
-        UsuarioEntity entity = buscarPorId(id);
+        UsuarioEntity entity = buscarPorIdEntity(id);
+
         entity.setStatus("ATIVO");
+
         return usuarioMapper.toResponse(usuarioRepository.save(entity));
     }
 
     public UsuarioResponseRecord inativar(Long id) {
-        UsuarioEntity entity = buscarPorId(id);
+        UsuarioEntity entity = buscarPorIdEntity(id);
+
         entity.setStatus("INATIVO");
+
         return usuarioMapper.toResponse(usuarioRepository.save(entity));
     }
 
-    public UsuarioResponseRecord buscarPorId(Long id, boolean response) {
-        return usuarioMapper.toResponse(buscarPorId(id));
+    public UsuarioResponseRecord buscarPorId(Long id) {
+        return usuarioMapper.toResponse(buscarPorIdEntity(id));
     }
 
     public List<UsuarioResponseRecord> listarTodos() {
@@ -60,7 +72,7 @@ public class UsuarioService {
                 .toList();
     }
 
-    private UsuarioEntity buscarPorId(Long id) {
+    private UsuarioEntity buscarPorIdEntity(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com id: " + id));
     }
