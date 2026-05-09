@@ -7,6 +7,7 @@ import com.bar.sistemabar.internal.entradaProduto.dto.EntradaProdutoResponseReco
 import com.bar.sistemabar.internal.entradaProduto.entity.EntradaProdutoEntity;
 import com.bar.sistemabar.internal.entradaProduto.mapper.EntradaProdutoMapperRecord;
 import com.bar.sistemabar.internal.entradaProduto.repository.EntradaProdutoRepository;
+import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
 import com.bar.sistemabar.internal.movimentoDia.entity.StatusMovimentoDia;
 import com.bar.sistemabar.internal.movimentoDia.repository.MovimentoDiaRepository;
 import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
@@ -42,14 +43,13 @@ public class EntradaProdutoService {
     @Transactional
     public EntradaProdutoResponseRecord cadastrar(EntradaProdutoRequestRecord request) {
 
-        boolean existeMovimentoAberto = movimentoDiaRepository.existsByDataMovimentoAndStatus(
-                LocalDate.now(),
-                StatusMovimentoDia.ABERTO
-        );
-
-        if (!existeMovimentoAberto) {
-            throw new BusinessException("Não existe movimento do dia aberto para registrar entrada de produto.");
-        }
+        MovimentoDiaEntity movimentoDia = movimentoDiaRepository
+                .findByDataMovimentoAndStatus(
+                        LocalDate.now(),
+                        StatusMovimentoDia.ABERTO
+                )
+                .orElseThrow(() ->
+                        new BusinessException("Não existe movimento do dia aberto para registrar entrada de produto."));
 
         ProdutoEntity produto = produtoRepository.findById(request.produtoId())
                 .orElseThrow(() ->
@@ -62,7 +62,8 @@ public class EntradaProdutoService {
         EntradaProdutoEntity entrada = EntradaProdutoMapperRecord.paraEntity(
                 request,
                 produto,
-                usuario
+                usuario,
+                movimentoDia
         );
 
         EntradaProdutoEntity entradaSalva = entradaProdutoRepository.save(entrada);

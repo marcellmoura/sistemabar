@@ -3,6 +3,7 @@ package com.bar.sistemabar.internal.entradaProduto.mapper;
 import com.bar.sistemabar.internal.entradaProduto.dto.EntradaProdutoRequestRecord;
 import com.bar.sistemabar.internal.entradaProduto.dto.EntradaProdutoResponseRecord;
 import com.bar.sistemabar.internal.entradaProduto.entity.EntradaProdutoEntity;
+import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
 import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
 import com.bar.sistemabar.internal.usuario.entity.UsuarioEntity;
 
@@ -14,7 +15,8 @@ public record EntradaProdutoMapperRecord() {
     public static EntradaProdutoEntity paraEntity(
             EntradaProdutoRequestRecord request,
             ProdutoEntity produto,
-            UsuarioEntity usuario
+            UsuarioEntity usuario,
+            MovimentoDiaEntity movimentoDia
     ) {
 
         return new EntradaProdutoEntity(
@@ -22,7 +24,8 @@ public record EntradaProdutoMapperRecord() {
                 request.tipoEntrada(),
                 LocalDateTime.now(),
                 produto,
-                usuario
+                usuario,
+                movimentoDia
         );
     }
 

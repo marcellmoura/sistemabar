@@ -1,5 +1,6 @@
 package com.bar.sistemabar.internal.saidaProduto.entity;
 
+import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
 import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
 import com.bar.sistemabar.internal.usuario.entity.UsuarioEntity;
 import jakarta.persistence.*;
@@ -29,15 +30,25 @@ public class SaidaProdutoEntity {
     @JoinColumn(name = "usuario_id")
     private UsuarioEntity usuario;
 
+    @ManyToOne
+    @JoinColumn(name = "movimento_dia_id")
+    private MovimentoDiaEntity movimentoDia;
+
     public SaidaProdutoEntity() {
     }
 
-    public SaidaProdutoEntity(Integer quantidade, TipoSaidaProduto tipoSaida, LocalDateTime dataHora, ProdutoEntity produto, UsuarioEntity usuario) {
+    public SaidaProdutoEntity(Integer quantidade,
+                              TipoSaidaProduto tipoSaida,
+                              LocalDateTime dataHora,
+                              ProdutoEntity produto,
+                              UsuarioEntity usuario,
+                              MovimentoDiaEntity movimentoDia) {
         this.quantidade = quantidade;
         this.tipoSaida = tipoSaida;
         this.dataHora = dataHora;
         this.produto = produto;
         this.usuario = usuario;
+        this.movimentoDia = movimentoDia;
     }
 
     public Long getId() {
@@ -64,6 +75,10 @@ public class SaidaProdutoEntity {
         return usuario;
     }
 
+    public MovimentoDiaEntity getMovimentoDia() {
+        return movimentoDia;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -86,5 +101,9 @@ public class SaidaProdutoEntity {
 
     public void setUsuario(UsuarioEntity usuario) {
         this.usuario = usuario;
+    }
+
+    public void setMovimentoDia(MovimentoDiaEntity movimentoDia) {
+        this.movimentoDia = movimentoDia;
     }
 }

@@ -2,6 +2,7 @@ package com.bar.sistemabar.internal.saidaProduto.service;
 
 import com.bar.sistemabar.config.exception.BusinessException;
 import com.bar.sistemabar.config.exception.RecursoNaoEncontradoException;
+import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
 import com.bar.sistemabar.internal.movimentoDia.entity.StatusMovimentoDia;
 import com.bar.sistemabar.internal.movimentoDia.repository.MovimentoDiaRepository;
 import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
@@ -32,7 +33,6 @@ public class SaidaProdutoService {
                                ProdutoRepository produtoRepository,
                                UsuarioRepository usuarioRepository,
                                MovimentoDiaRepository movimentoDiaRepository) {
-
         this.saidaProdutoRepository = saidaProdutoRepository;
         this.produtoRepository = produtoRepository;
         this.usuarioRepository = usuarioRepository;
@@ -42,14 +42,13 @@ public class SaidaProdutoService {
     @Transactional
     public SaidaProdutoResponseRecord registrar(SaidaProdutoRequestRecord request) {
 
-        boolean existeMovimentoAberto = movimentoDiaRepository.existsByDataMovimentoAndStatus(
-                LocalDate.now(),
-                StatusMovimentoDia.ABERTO
-        );
-
-        if (!existeMovimentoAberto) {
-            throw new BusinessException("Não existe movimento do dia aberto para registrar saída de produto.");
-        }
+        MovimentoDiaEntity movimentoDia = movimentoDiaRepository
+                .findByDataMovimentoAndStatus(
+                        LocalDate.now(),
+                        StatusMovimentoDia.ABERTO
+                )
+                .orElseThrow(() ->
+                        new BusinessException("Não existe movimento do dia aberto para registrar saída de produto."));
 
         ProdutoEntity produto = produtoRepository.findById(request.produtoId())
                 .orElseThrow(() ->
@@ -72,7 +71,8 @@ public class SaidaProdutoService {
                 request.tipoSaida(),
                 LocalDateTime.now(),
                 produto,
-                usuario
+                usuario,
+                movimentoDia
         );
 
         SaidaProdutoEntity saidaSalva = saidaProdutoRepository.save(entity);
@@ -81,7 +81,6 @@ public class SaidaProdutoService {
     }
 
     public List<SaidaProdutoResponseRecord> listar() {
-
         return SaidaProdutoMapperRecord.entityListToResponseList(
                 saidaProdutoRepository.findAll()
         );
