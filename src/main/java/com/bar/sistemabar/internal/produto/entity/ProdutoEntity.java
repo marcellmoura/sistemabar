@@ -15,6 +15,8 @@ public class ProdutoEntity {
 
     private Double preco;
 
+    private Integer quantidadeEstoque;
+
     private Boolean controlaEstoque;
 
     private String tipoLancamento;
@@ -28,9 +30,18 @@ public class ProdutoEntity {
     public ProdutoEntity() {
     }
 
-    public ProdutoEntity(String nome, Double preco, Boolean controlaEstoque, String tipoLancamento, String status, CategoriaEntity categoria) {
+    public ProdutoEntity(
+            String nome,
+            Double preco,
+            Integer quantidadeEstoque,
+            Boolean controlaEstoque,
+            String tipoLancamento,
+            String status,
+            CategoriaEntity categoria
+    ) {
         this.nome = nome;
         this.preco = preco;
+        this.quantidadeEstoque = quantidadeEstoque;
         this.controlaEstoque = controlaEstoque;
         this.tipoLancamento = tipoLancamento;
         this.status = status;
@@ -47,6 +58,10 @@ public class ProdutoEntity {
 
     public Double getPreco() {
         return preco;
+    }
+
+    public Integer getQuantidadeEstoque() {
+        return quantidadeEstoque;
     }
 
     public Boolean getControlaEstoque() {
@@ -75,6 +90,10 @@ public class ProdutoEntity {
 
     public void setPreco(Double preco) {
         this.preco = preco;
+    }
+
+    public void setQuantidadeEstoque(Integer quantidadeEstoque) {
+        this.quantidadeEstoque = quantidadeEstoque;
     }
 
     public void setControlaEstoque(Boolean controlaEstoque) {

@@ -14,6 +14,7 @@ public record ProdutoMapperRecord() {
         return new ProdutoEntity(
                 request.nome(),
                 request.preco(),
+                0,
                 request.controlaEstoque(),
                 request.tipoLancamento(),
                 request.status(),
@@ -27,6 +28,7 @@ public record ProdutoMapperRecord() {
                 entity.getId(),
                 entity.getNome(),
                 entity.getPreco(),
+                entity.getQuantidadeEstoque(),
                 entity.getControlaEstoque(),
                 entity.getTipoLancamento(),
                 entity.getStatus(),
