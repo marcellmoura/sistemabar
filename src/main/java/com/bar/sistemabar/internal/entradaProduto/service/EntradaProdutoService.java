@@ -11,6 +11,7 @@ import com.bar.sistemabar.internal.produto.repository.ProdutoRepository;
 import com.bar.sistemabar.internal.usuario.entity.UsuarioEntity;
 import com.bar.sistemabar.internal.usuario.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class EntradaProdutoService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    @Transactional
     public EntradaProdutoResponseRecord cadastrar(EntradaProdutoRequestRecord request) {
 
         ProdutoEntity produto = produtoRepository.findById(request.produtoId())
