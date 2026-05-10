@@ -14,6 +14,8 @@ import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
 import com.bar.sistemabar.internal.movimentoDia.repository.MovimentoDiaRepository;
 import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
 import com.bar.sistemabar.internal.produto.repository.ProdutoRepository;
+import com.bar.sistemabar.internal.saidaProduto.entity.SaidaProdutoEntity;
+import com.bar.sistemabar.internal.saidaProduto.repository.SaidaProdutoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,18 +28,21 @@ public class ContagemEstoqueDiaService {
     private final ProdutoRepository produtoRepository;
     private final MovimentoDiaRepository movimentoDiaRepository;
     private final EntradaProdutoRepository entradaProdutoRepository;
+    private final SaidaProdutoRepository saidaProdutoRepository;
 
     public ContagemEstoqueDiaService(
             ContagemEstoqueDiaRepository contagemEstoqueDiaRepository,
             ProdutoRepository produtoRepository,
             MovimentoDiaRepository movimentoDiaRepository,
-            EntradaProdutoRepository entradaProdutoRepository
+            EntradaProdutoRepository entradaProdutoRepository,
+            SaidaProdutoRepository saidaProdutoRepository
     ) {
 
         this.contagemEstoqueDiaRepository = contagemEstoqueDiaRepository;
         this.produtoRepository = produtoRepository;
         this.movimentoDiaRepository = movimentoDiaRepository;
         this.entradaProdutoRepository = entradaProdutoRepository;
+        this.saidaProdutoRepository = saidaProdutoRepository;
     }
 
     @Transactional
@@ -126,9 +131,23 @@ public class ContagemEstoqueDiaService {
                 .mapToInt(EntradaProdutoEntity::getQuantidade)
                 .sum();
 
+        List<SaidaProdutoEntity> saidas =
+                saidaProdutoRepository.findByMovimentoDiaId(
+                        contagem.getMovimentoDia().getId()
+                );
+
+        int totalSaidasEspeciaisProduto = saidas.stream()
+                .filter(saida ->
+                        saida.getProduto().getId()
+                                .equals(contagem.getProduto().getId())
+                )
+                .mapToInt(SaidaProdutoEntity::getQuantidade)
+                .sum();
+
         int quantidadeVendida =
                 contagem.getQuantidadeInicial()
                         + totalEntradasProduto
+                        - totalSaidasEspeciaisProduto
                         - contagem.getQuantidadeFinal();
 
         contagem.setQuantidadeVendidaCalculada(quantidadeVendida);

@@ -10,6 +10,9 @@ import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
 import com.bar.sistemabar.internal.movimentoDia.entity.StatusMovimentoDia;
 import com.bar.sistemabar.internal.movimentoDia.mapper.MovimentoDiaMapperRecord;
 import com.bar.sistemabar.internal.movimentoDia.repository.MovimentoDiaRepository;
+import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
+import com.bar.sistemabar.internal.produto.entity.StatusProduto;
+import com.bar.sistemabar.internal.produto.repository.ProdutoRepository;
 import com.bar.sistemabar.internal.usuario.entity.UsuarioEntity;
 import com.bar.sistemabar.internal.usuario.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -25,16 +28,19 @@ public class MovimentoDiaService {
     private final MovimentoDiaRepository movimentoDiaRepository;
     private final UsuarioRepository usuarioRepository;
     private final ContagemEstoqueDiaRepository contagemEstoqueDiaRepository;
+    private final ProdutoRepository produtoRepository;
 
     public MovimentoDiaService(
             MovimentoDiaRepository movimentoDiaRepository,
             UsuarioRepository usuarioRepository,
-            ContagemEstoqueDiaRepository contagemEstoqueDiaRepository
+            ContagemEstoqueDiaRepository contagemEstoqueDiaRepository,
+            ProdutoRepository produtoRepository
     ) {
 
         this.movimentoDiaRepository = movimentoDiaRepository;
         this.usuarioRepository = usuarioRepository;
         this.contagemEstoqueDiaRepository = contagemEstoqueDiaRepository;
+        this.produtoRepository = produtoRepository;
     }
 
     @Transactional
@@ -99,6 +105,8 @@ public class MovimentoDiaService {
             );
         }
 
+        validarTodosProdutosComEstoqueForamContados(id, contagens);
+
         movimentoDia.setStatus(StatusMovimentoDia.FECHADO);
         movimentoDia.setDataHoraFechamento(LocalDateTime.now());
 
@@ -107,5 +115,34 @@ public class MovimentoDiaService {
 
         return MovimentoDiaMapperRecord
                 .entityToResponseRecord(movimentoFechado);
+    }
+
+    private void validarTodosProdutosComEstoqueForamContados(
+            Long movimentoDiaId,
+            List<ContagemEstoqueDiaEntity> contagens
+    ) {
+
+        List<ProdutoEntity> produtosComEstoque =
+                produtoRepository.findByControlaEstoqueTrueAndStatus(
+                        StatusProduto.ATIVO
+                );
+
+        List<Long> produtosContadosIds = contagens.stream()
+                .map(contagem -> contagem.getProduto().getId())
+                .toList();
+
+        List<String> produtosSemContagem = produtosComEstoque.stream()
+                .filter(produto ->
+                        !produtosContadosIds.contains(produto.getId())
+                )
+                .map(ProdutoEntity::getNome)
+                .toList();
+
+        if (!produtosSemContagem.isEmpty()) {
+            throw new BusinessException(
+                    "Não é possível fechar o movimento. Existem produtos com controle de estoque sem contagem registrada: "
+                            + String.join(", ", produtosSemContagem)
+            );
+        }
     }
 }

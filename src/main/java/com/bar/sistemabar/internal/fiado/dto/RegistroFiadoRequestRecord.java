@@ -1,11 +1,13 @@
-package com.bar.sistemabar.internal.saidaProduto.dto;
+package com.bar.sistemabar.internal.fiado.dto;
 
-import com.bar.sistemabar.internal.saidaProduto.entity.TipoSaidaProduto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public record SaidaProdutoRequestRecord(
+public record RegistroFiadoRequestRecord(
+
+        @NotNull(message = "A pessoa do fiado é obrigatória.")
+        Long pessoaFiadoId,
 
         @NotNull(message = "O produto é obrigatório.")
         Long produtoId,
@@ -16,9 +18,6 @@ public record SaidaProdutoRequestRecord(
         @NotNull(message = "A quantidade é obrigatória.")
         @Positive(message = "A quantidade deve ser maior que zero.")
         Integer quantidade,
-
-        @NotNull(message = "O tipo de saída é obrigatório.")
-        TipoSaidaProduto tipoSaida,
 
         @Size(max = 255, message = "A observação deve ter no máximo 255 caracteres.")
         String observacao

@@ -17,7 +17,8 @@ public record SaidaProdutoMapperRecord() {
                 entity.getUsuario().getNome(),
                 entity.getQuantidade(),
                 entity.getTipoSaida(),
-                entity.getDataHora()
+                entity.getDataHora(),
+                entity.getObservacao()
         );
     }
 

@@ -1,4 +1,4 @@
-package com.bar.sistemabar.internal.saidaProduto.entity;
+package com.bar.sistemabar.internal.fiado.entity;
 
 import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
 import com.bar.sistemabar.internal.produto.entity.ProdutoEntity;
@@ -8,8 +8,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TB_SAIDA_PRODUTO")
-public class SaidaProdutoEntity {
+@Table(name = "TB_REGISTRO_FIADO")
+public class RegistroFiadoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,12 +17,18 @@ public class SaidaProdutoEntity {
 
     private Integer quantidade;
 
-    @Enumerated(EnumType.STRING)
-    private TipoSaidaProduto tipoSaida;
+    private Double valor;
 
     private LocalDateTime dataHora;
 
     private String observacao;
+
+    @Enumerated(EnumType.STRING)
+    private StatusFiado status;
+
+    @ManyToOne
+    @JoinColumn(name = "pessoa_fiado_id")
+    private PessoaFiadoEntity pessoaFiado;
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
@@ -36,20 +42,24 @@ public class SaidaProdutoEntity {
     @JoinColumn(name = "movimento_dia_id")
     private MovimentoDiaEntity movimentoDia;
 
-    public SaidaProdutoEntity() {
+    public RegistroFiadoEntity() {
     }
 
-    public SaidaProdutoEntity(Integer quantidade,
-                              TipoSaidaProduto tipoSaida,
-                              LocalDateTime dataHora,
-                              String observacao,
-                              ProdutoEntity produto,
-                              UsuarioEntity usuario,
-                              MovimentoDiaEntity movimentoDia) {
+    public RegistroFiadoEntity(Integer quantidade,
+                               Double valor,
+                               LocalDateTime dataHora,
+                               String observacao,
+                               StatusFiado status,
+                               PessoaFiadoEntity pessoaFiado,
+                               ProdutoEntity produto,
+                               UsuarioEntity usuario,
+                               MovimentoDiaEntity movimentoDia) {
         this.quantidade = quantidade;
-        this.tipoSaida = tipoSaida;
+        this.valor = valor;
         this.dataHora = dataHora;
         this.observacao = observacao;
+        this.status = status;
+        this.pessoaFiado = pessoaFiado;
         this.produto = produto;
         this.usuario = usuario;
         this.movimentoDia = movimentoDia;
@@ -63,8 +73,8 @@ public class SaidaProdutoEntity {
         return quantidade;
     }
 
-    public TipoSaidaProduto getTipoSaida() {
-        return tipoSaida;
+    public Double getValor() {
+        return valor;
     }
 
     public LocalDateTime getDataHora() {
@@ -73,6 +83,14 @@ public class SaidaProdutoEntity {
 
     public String getObservacao() {
         return observacao;
+    }
+
+    public StatusFiado getStatus() {
+        return status;
+    }
+
+    public PessoaFiadoEntity getPessoaFiado() {
+        return pessoaFiado;
     }
 
     public ProdutoEntity getProduto() {
@@ -95,8 +113,8 @@ public class SaidaProdutoEntity {
         this.quantidade = quantidade;
     }
 
-    public void setTipoSaida(TipoSaidaProduto tipoSaida) {
-        this.tipoSaida = tipoSaida;
+    public void setValor(Double valor) {
+        this.valor = valor;
     }
 
     public void setDataHora(LocalDateTime dataHora) {
@@ -105,6 +123,14 @@ public class SaidaProdutoEntity {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public void setStatus(StatusFiado status) {
+        this.status = status;
+    }
+
+    public void setPessoaFiado(PessoaFiadoEntity pessoaFiado) {
+        this.pessoaFiado = pessoaFiado;
     }
 
     public void setProduto(ProdutoEntity produto) {

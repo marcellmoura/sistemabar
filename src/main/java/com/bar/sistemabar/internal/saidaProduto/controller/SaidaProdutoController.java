@@ -33,4 +33,12 @@ public class SaidaProdutoController {
 
         return saidaProdutoService.listar();
     }
+
+    @GetMapping("/movimento/{movimentoDiaId}")
+    public List<SaidaProdutoResponseRecord> listarPorMovimento(
+            @PathVariable Long movimentoDiaId
+    ) {
+
+        return saidaProdutoService.listarPorMovimento(movimentoDiaId);
+    }
 }

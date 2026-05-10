@@ -13,7 +13,8 @@ public record SaidaProdutoResponseRecord(
         String usuarioNome,
         Integer quantidade,
         TipoSaidaProduto tipoSaida,
-        LocalDateTime dataHora
+        LocalDateTime dataHora,
+        String observacao
 
 ) {
 }

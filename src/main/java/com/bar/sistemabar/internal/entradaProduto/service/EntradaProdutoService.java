@@ -2,6 +2,8 @@ package com.bar.sistemabar.internal.entradaProduto.service;
 
 import com.bar.sistemabar.config.exception.BusinessException;
 import com.bar.sistemabar.config.exception.RecursoNaoEncontradoException;
+import com.bar.sistemabar.internal.contagemEstoqueDia.entity.ContagemEstoqueDiaEntity;
+import com.bar.sistemabar.internal.contagemEstoqueDia.repository.ContagemEstoqueDiaRepository;
 import com.bar.sistemabar.internal.entradaProduto.dto.EntradaProdutoRequestRecord;
 import com.bar.sistemabar.internal.entradaProduto.dto.EntradaProdutoResponseRecord;
 import com.bar.sistemabar.internal.entradaProduto.entity.EntradaProdutoEntity;
@@ -27,17 +29,20 @@ public class EntradaProdutoService {
     private final ProdutoRepository produtoRepository;
     private final UsuarioRepository usuarioRepository;
     private final MovimentoDiaRepository movimentoDiaRepository;
+    private final ContagemEstoqueDiaRepository contagemEstoqueDiaRepository;
 
     public EntradaProdutoService(
             EntradaProdutoRepository entradaProdutoRepository,
             ProdutoRepository produtoRepository,
             UsuarioRepository usuarioRepository,
-            MovimentoDiaRepository movimentoDiaRepository
+            MovimentoDiaRepository movimentoDiaRepository,
+            ContagemEstoqueDiaRepository contagemEstoqueDiaRepository
     ) {
         this.entradaProdutoRepository = entradaProdutoRepository;
         this.produtoRepository = produtoRepository;
         this.usuarioRepository = usuarioRepository;
         this.movimentoDiaRepository = movimentoDiaRepository;
+        this.contagemEstoqueDiaRepository = contagemEstoqueDiaRepository;
     }
 
     @Transactional
@@ -58,6 +63,8 @@ public class EntradaProdutoService {
         UsuarioEntity usuario = usuarioRepository.findById(request.usuarioId())
                 .orElseThrow(() ->
                         new RecursoNaoEncontradoException("Usuário não encontrado."));
+
+        validarProdutoSemContagemFinal(produto.getId(), movimentoDia.getId());
 
         EntradaProdutoEntity entrada = EntradaProdutoMapperRecord.paraEntity(
                 request,
@@ -86,5 +93,19 @@ public class EntradaProdutoService {
         List<EntradaProdutoEntity> entradas = entradaProdutoRepository.findAll();
 
         return EntradaProdutoMapperRecord.paraListaResponse(entradas);
+    }
+
+    private void validarProdutoSemContagemFinal(Long produtoId, Long movimentoDiaId) {
+
+        boolean possuiContagemFinal = contagemEstoqueDiaRepository
+                .findByProdutoIdAndMovimentoDiaId(produtoId, movimentoDiaId)
+                .map(ContagemEstoqueDiaEntity::getQuantidadeFinal)
+                .isPresent();
+
+        if (possuiContagemFinal) {
+            throw new BusinessException(
+                    "Não é possível lançar movimentações para produto com contagem final já registrada."
+            );
+        }
     }
 }
