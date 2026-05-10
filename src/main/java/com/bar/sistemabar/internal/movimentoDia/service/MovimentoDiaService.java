@@ -2,6 +2,8 @@ package com.bar.sistemabar.internal.movimentoDia.service;
 
 import com.bar.sistemabar.config.exception.BusinessException;
 import com.bar.sistemabar.config.exception.RecursoNaoEncontradoException;
+import com.bar.sistemabar.internal.contagemEstoqueDia.entity.ContagemEstoqueDiaEntity;
+import com.bar.sistemabar.internal.contagemEstoqueDia.repository.ContagemEstoqueDiaRepository;
 import com.bar.sistemabar.internal.movimentoDia.dto.MovimentoDiaRequestRecord;
 import com.bar.sistemabar.internal.movimentoDia.dto.MovimentoDiaResponseRecord;
 import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
@@ -15,18 +17,24 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MovimentoDiaService {
 
     private final MovimentoDiaRepository movimentoDiaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ContagemEstoqueDiaRepository contagemEstoqueDiaRepository;
 
-    public MovimentoDiaService(MovimentoDiaRepository movimentoDiaRepository,
-                               UsuarioRepository usuarioRepository) {
+    public MovimentoDiaService(
+            MovimentoDiaRepository movimentoDiaRepository,
+            UsuarioRepository usuarioRepository,
+            ContagemEstoqueDiaRepository contagemEstoqueDiaRepository
+    ) {
 
         this.movimentoDiaRepository = movimentoDiaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.contagemEstoqueDiaRepository = contagemEstoqueDiaRepository;
     }
 
     @Transactional
@@ -73,8 +81,25 @@ public class MovimentoDiaService {
                                 "Movimento aberto não encontrado"
                         ));
 
-        movimentoDia.setStatus(StatusMovimentoDia.FECHADO);
+        List<ContagemEstoqueDiaEntity> contagens =
+                contagemEstoqueDiaRepository.findByMovimentoDiaId(id);
 
+        if (contagens.isEmpty()) {
+            throw new BusinessException(
+                    "Não é possível fechar o movimento sem contagens de estoque registradas"
+            );
+        }
+
+        boolean existeContagemSemFinal = contagens.stream()
+                .anyMatch(contagem -> contagem.getQuantidadeFinal() == null);
+
+        if (existeContagemSemFinal) {
+            throw new BusinessException(
+                    "Não é possível fechar o movimento. Existem produtos sem contagem final"
+            );
+        }
+
+        movimentoDia.setStatus(StatusMovimentoDia.FECHADO);
         movimentoDia.setDataHoraFechamento(LocalDateTime.now());
 
         MovimentoDiaEntity movimentoFechado =
