@@ -4,6 +4,10 @@ import com.bar.sistemabar.config.exception.BusinessException;
 import com.bar.sistemabar.config.exception.RecursoNaoEncontradoException;
 import com.bar.sistemabar.internal.contagemEstoqueDia.entity.ContagemEstoqueDiaEntity;
 import com.bar.sistemabar.internal.contagemEstoqueDia.repository.ContagemEstoqueDiaRepository;
+import com.bar.sistemabar.internal.fiado.entity.RegistroFiadoEntity;
+import com.bar.sistemabar.internal.fiado.entity.StatusFiado;
+import com.bar.sistemabar.internal.fiado.repository.RegistroFiadoRepository;
+import com.bar.sistemabar.internal.movimentoDia.dto.FechamentoMovimentoResponseRecord;
 import com.bar.sistemabar.internal.movimentoDia.dto.MovimentoDiaRequestRecord;
 import com.bar.sistemabar.internal.movimentoDia.dto.MovimentoDiaResponseRecord;
 import com.bar.sistemabar.internal.movimentoDia.entity.MovimentoDiaEntity;
@@ -29,18 +33,21 @@ public class MovimentoDiaService {
     private final UsuarioRepository usuarioRepository;
     private final ContagemEstoqueDiaRepository contagemEstoqueDiaRepository;
     private final ProdutoRepository produtoRepository;
+    private final RegistroFiadoRepository registroFiadoRepository;
 
     public MovimentoDiaService(
             MovimentoDiaRepository movimentoDiaRepository,
             UsuarioRepository usuarioRepository,
             ContagemEstoqueDiaRepository contagemEstoqueDiaRepository,
-            ProdutoRepository produtoRepository
+            ProdutoRepository produtoRepository,
+            RegistroFiadoRepository registroFiadoRepository
     ) {
 
         this.movimentoDiaRepository = movimentoDiaRepository;
         this.usuarioRepository = usuarioRepository;
         this.contagemEstoqueDiaRepository = contagemEstoqueDiaRepository;
         this.produtoRepository = produtoRepository;
+        this.registroFiadoRepository = registroFiadoRepository;
     }
 
     @Transactional
@@ -78,7 +85,7 @@ public class MovimentoDiaService {
     }
 
     @Transactional
-    public MovimentoDiaResponseRecord fecharMovimento(Long id) {
+    public FechamentoMovimentoResponseRecord fecharMovimento(Long id) {
 
         MovimentoDiaEntity movimentoDia = movimentoDiaRepository
                 .findByIdAndStatus(id, StatusMovimentoDia.ABERTO)
@@ -106,8 +113,7 @@ public class MovimentoDiaService {
         MovimentoDiaEntity movimentoFechado =
                 movimentoDiaRepository.save(movimentoDia);
 
-        return MovimentoDiaMapperRecord
-                .entityToResponseRecord(movimentoFechado);
+        return montarRespostaFechamento(movimentoFechado, contagens);
     }
 
     private void validarContagensComFinal(
@@ -153,5 +159,47 @@ public class MovimentoDiaService {
                             + String.join(", ", produtosSemContagem)
             );
         }
+    }
+
+    private FechamentoMovimentoResponseRecord montarRespostaFechamento(
+            MovimentoDiaEntity movimentoDia,
+            List<ContagemEstoqueDiaEntity> contagens
+    ) {
+
+        Double valorVendidoCalculado = contagens.stream()
+                .map(ContagemEstoqueDiaEntity::getValorVendidoCalculado)
+                .reduce(0.0, Double::sum);
+
+        List<RegistroFiadoEntity> fiados =
+                registroFiadoRepository.findByMovimentoDiaId(movimentoDia.getId());
+
+        Double valorFiadoAberto = fiados.stream()
+                .filter(fiado -> fiado.getStatus() == StatusFiado.ABERTO)
+                .map(RegistroFiadoEntity::getValor)
+                .reduce(0.0, Double::sum);
+
+        Double valorFiadoPago = fiados.stream()
+                .filter(fiado -> fiado.getStatus() == StatusFiado.PAGO)
+                .map(RegistroFiadoEntity::getValor)
+                .reduce(0.0, Double::sum);
+
+        Double valorTotalFiado = valorFiadoAberto + valorFiadoPago;
+
+        Double valorRecebidoEstimado = valorVendidoCalculado + valorFiadoPago;
+
+        return new FechamentoMovimentoResponseRecord(
+                movimentoDia.getId(),
+                movimentoDia.getDataMovimento(),
+                movimentoDia.getDataHoraAbertura(),
+                movimentoDia.getDataHoraFechamento(),
+                movimentoDia.getTrocoInicial(),
+                movimentoDia.getStatus(),
+                movimentoDia.getUsuarioResponsavel().getNome(),
+                valorVendidoCalculado,
+                valorFiadoAberto,
+                valorFiadoPago,
+                valorTotalFiado,
+                valorRecebidoEstimado
+        );
     }
 }

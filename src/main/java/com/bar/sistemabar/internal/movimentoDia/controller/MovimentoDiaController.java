@@ -1,5 +1,6 @@
 package com.bar.sistemabar.internal.movimentoDia.controller;
 
+import com.bar.sistemabar.internal.movimentoDia.dto.FechamentoMovimentoResponseRecord;
 import com.bar.sistemabar.internal.movimentoDia.dto.MovimentoDiaRequestRecord;
 import com.bar.sistemabar.internal.movimentoDia.dto.MovimentoDiaResponseRecord;
 import com.bar.sistemabar.internal.movimentoDia.service.MovimentoDiaService;
@@ -24,7 +25,7 @@ public class MovimentoDiaController {
     }
 
     @PatchMapping("/{id}/fechar")
-    public MovimentoDiaResponseRecord fecharMovimento(@PathVariable Long id) {
+    public FechamentoMovimentoResponseRecord fecharMovimento(@PathVariable Long id) {
         return movimentoDiaService.fecharMovimento(id);
     }
 }

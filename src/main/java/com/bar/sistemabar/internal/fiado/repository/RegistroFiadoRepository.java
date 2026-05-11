@@ -12,4 +12,6 @@ public interface RegistroFiadoRepository extends JpaRepository<RegistroFiadoEnti
 
     List<RegistroFiadoEntity> findByStatus(StatusFiado status);
 
+    List<RegistroFiadoEntity> findByMovimentoDiaId(Long movimentoDiaId);
+
 }
