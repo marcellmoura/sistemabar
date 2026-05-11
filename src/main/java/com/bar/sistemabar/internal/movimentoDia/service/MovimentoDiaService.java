@@ -96,16 +96,9 @@ public class MovimentoDiaService {
             );
         }
 
-        boolean existeContagemSemFinal = contagens.stream()
-                .anyMatch(contagem -> contagem.getQuantidadeFinal() == null);
+        validarContagensComFinal(contagens);
 
-        if (existeContagemSemFinal) {
-            throw new BusinessException(
-                    "Não é possível fechar o movimento. Existem produtos sem contagem final"
-            );
-        }
-
-        validarTodosProdutosComEstoqueForamContados(id, contagens);
+        validarTodosProdutosComEstoqueForamContados(contagens);
 
         movimentoDia.setStatus(StatusMovimentoDia.FECHADO);
         movimentoDia.setDataHoraFechamento(LocalDateTime.now());
@@ -117,8 +110,24 @@ public class MovimentoDiaService {
                 .entityToResponseRecord(movimentoFechado);
     }
 
+    private void validarContagensComFinal(
+            List<ContagemEstoqueDiaEntity> contagens
+    ) {
+
+        List<String> produtosSemContagemFinal = contagens.stream()
+                .filter(contagem -> contagem.getQuantidadeFinal() == null)
+                .map(contagem -> contagem.getProduto().getNome())
+                .toList();
+
+        if (!produtosSemContagemFinal.isEmpty()) {
+            throw new BusinessException(
+                    "Não é possível fechar o movimento. Existem produtos sem contagem final: "
+                            + String.join(", ", produtosSemContagemFinal)
+            );
+        }
+    }
+
     private void validarTodosProdutosComEstoqueForamContados(
-            Long movimentoDiaId,
             List<ContagemEstoqueDiaEntity> contagens
     ) {
 
