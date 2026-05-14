@@ -163,4 +163,21 @@ public class ContagemEstoqueDiaService {
         return ContagemEstoqueDiaMapperRecord
                 .entityToResponse(contagemAtualizada);
     }
+
+    @Transactional(readOnly = true)
+    public List<ContagemEstoqueDiaResponseRecord> listarPorMovimento(
+            Long movimentoDiaId
+    ) {
+
+        movimentoDiaRepository.findById(movimentoDiaId)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException("Movimento do dia não encontrado")
+                );
+
+        List<ContagemEstoqueDiaEntity> contagens =
+                contagemEstoqueDiaRepository.findByMovimentoDiaId(movimentoDiaId);
+
+        return ContagemEstoqueDiaMapperRecord
+                .entityListToResponseList(contagens);
+    }
 }

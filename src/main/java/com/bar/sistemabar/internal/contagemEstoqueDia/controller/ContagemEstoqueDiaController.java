@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/contagens-estoque")
 public class ContagemEstoqueDiaController {
@@ -45,5 +47,15 @@ public class ContagemEstoqueDiaController {
                 contagemEstoqueDiaService.registrarContagemFinal(id, request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/movimento/{movimentoDiaId}")
+    public ResponseEntity<List<ContagemEstoqueDiaResponseRecord>> listarPorMovimento(
+            @PathVariable Long movimentoDiaId
+    ) {
+
+        return ResponseEntity.ok(
+                contagemEstoqueDiaService.listarPorMovimento(movimentoDiaId)
+        );
     }
 }
