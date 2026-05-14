@@ -77,6 +77,8 @@ public class SaidaProdutoService {
             );
         }
 
+        validarTipoSaidaPermitido(request);
+
         validarProdutoSemContagemFinal(produto.getId(), movimentoDia.getId());
 
         validarObservacaoObrigatoria(request);
@@ -116,6 +118,15 @@ public class SaidaProdutoService {
 
         return SaidaProdutoMapperRecord
                 .entityListToResponseList(saidas);
+    }
+
+    private void validarTipoSaidaPermitido(SaidaProdutoRequestRecord request) {
+
+        if (request.tipoSaida() == TipoSaidaProduto.FIADO) {
+            throw new BusinessException(
+                    "Saídas do tipo FIADO devem ser registradas pelo módulo de fiados."
+            );
+        }
     }
 
     private void validarObservacaoObrigatoria(SaidaProdutoRequestRecord request) {
