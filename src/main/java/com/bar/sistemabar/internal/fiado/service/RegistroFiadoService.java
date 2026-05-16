@@ -2,6 +2,7 @@ package com.bar.sistemabar.internal.fiado.service;
 
 import com.bar.sistemabar.config.exception.BusinessException;
 import com.bar.sistemabar.config.exception.RecursoNaoEncontradoException;
+import com.bar.sistemabar.internal.caixa.repository.CaixaRepository;
 import com.bar.sistemabar.internal.contagemEstoqueDia.entity.ContagemEstoqueDiaEntity;
 import com.bar.sistemabar.internal.contagemEstoqueDia.repository.ContagemEstoqueDiaRepository;
 import com.bar.sistemabar.internal.fiado.dto.RegistroFiadoRequestRecord;
@@ -40,6 +41,7 @@ public class RegistroFiadoService {
     private final MovimentoDiaRepository movimentoDiaRepository;
     private final SaidaProdutoRepository saidaProdutoRepository;
     private final ContagemEstoqueDiaRepository contagemEstoqueDiaRepository;
+    private final CaixaRepository caixaRepository;
 
     public RegistroFiadoService(
             RegistroFiadoRepository registroFiadoRepository,
@@ -48,7 +50,8 @@ public class RegistroFiadoService {
             UsuarioRepository usuarioRepository,
             MovimentoDiaRepository movimentoDiaRepository,
             SaidaProdutoRepository saidaProdutoRepository,
-            ContagemEstoqueDiaRepository contagemEstoqueDiaRepository
+            ContagemEstoqueDiaRepository contagemEstoqueDiaRepository,
+            CaixaRepository caixaRepository
     ) {
         this.registroFiadoRepository = registroFiadoRepository;
         this.pessoaFiadoRepository = pessoaFiadoRepository;
@@ -57,6 +60,7 @@ public class RegistroFiadoService {
         this.movimentoDiaRepository = movimentoDiaRepository;
         this.saidaProdutoRepository = saidaProdutoRepository;
         this.contagemEstoqueDiaRepository = contagemEstoqueDiaRepository;
+        this.caixaRepository = caixaRepository;
     }
 
     @Transactional
@@ -184,12 +188,29 @@ public class RegistroFiadoService {
             );
         }
 
+        validarMovimentoSemCaixaConferido(registro);
+
         registro.setStatus(StatusFiado.PAGO);
 
         RegistroFiadoEntity registroAtualizado =
                 registroFiadoRepository.save(registro);
 
         return RegistroFiadoMapperRecord.entityToResponse(registroAtualizado);
+    }
+
+    private void validarMovimentoSemCaixaConferido(
+            RegistroFiadoEntity registro
+    ) {
+
+        boolean possuiCaixaConferido = caixaRepository.existsByMovimentoDiaId(
+                registro.getMovimentoDia().getId()
+        );
+
+        if (possuiCaixaConferido) {
+            throw new BusinessException(
+                    "Não é possível marcar fiado como pago após a conferência do caixa."
+            );
+        }
     }
 
     private void validarProdutoSemContagemFinal(Long produtoId, Long movimentoDiaId) {
